@@ -87,33 +87,34 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    #use stack
-    # if(problem.isGoalState(problem.getStartState())):
-    #     return
-    stack=util.Stack()
-    state=problem.getStartState()
-    stack.push((state,[],[]))
-    while not stack.isEmpty():
-        current_state, actions, visited = stack.pop()
-        # print (current_state, actions, visited)
-        '''
-         For a given state, this should return a list of triples, (successor,
-         action, stepCost), where 'successor' is a successor to the current state,
-         'action' is the action required to get there, and 'stepCost' is the incremental
-         cost of expanding to that successor.
-        '''
-        for pos, dir, step in problem.getSuccessors(current_state):
-            # print (pos, dir, step)
-            if  pos not in visited:
-                visited.append(pos)
-                #Returns True if and only if the state is a valid goal state.
-                if problem.isGoalState(pos):
-                    # print (actions + [dir])
-                    return actions + [dir]
-                #if not
-                stack.push((pos, actions + [dir], visited))
-
     # util.raiseNotDefined()
+    visited = []
+    fringe = util.Stack()
+    fringe.push([(problem.getStartState(), 'STOP', 0)])
+    #while not empty:
+    while not fringe.isEmpty():
+        current_path = fringe.pop()
+        # print current_path
+        #current_state is next one that need to be explored
+        current_state = current_path[len(current_path) - 1]
+        #if not visited
+        if not current_state[0] in visited:
+            #add the not been explored into the visited
+            visited.append(current_state[0])
+            #if the answer is goal
+            # print  map(lambda state: state[1], current_path[1:])
+            if problem.isGoalState(current_state[0]):
+                #if get answer,return the routine
+                return map(lambda state: state[1], current_path[1:])
+            #filter, we need to judge if child-node isn't in the frontier
+            non_visited_states = filter(lambda next_successor: not next_successor[0] in visited,
+                                        problem.getSuccessors(current_state[0]))
+            for successor in non_visited_states:
+                next_item = list(current_path)
+                next_item.append(successor)
+                fringe.push(next_item)
+
+
 
 
 def breadthFirstSearch(problem):
@@ -139,20 +140,41 @@ def breadthFirstSearch(problem):
     #                 return actions + [dir]
     #             # if not
     #             queue.push((pos, actions + [dir], visited + [current_state]))
-    queue = util.Queue()
-    state = problem.getStartState()
-    queue.push((state, list()))
+    # queue = util.Queue()
+    # state = problem.getStartState()
+    # queue.push((state, list()))
+    #
+    # visited = list()
+    # while not queue.isEmpty():
+    #     node, actions = queue.pop()
+    #
+    #     for pos, dir, steps in problem.getSuccessors(node):
+    #         if not pos in visited:
+    #             visited.append(pos)
+    #             if problem.isGoalState(pos):
+    #                 return actions + [dir]
+    #             queue.push((pos, actions + [dir]))
+    visited = []
+    fringe = util.Queue()
+    fringe.push([(problem.getStartState(), 'STOP', 0)])
 
-    visited = list()
-    while not queue.isEmpty():
-        node, actions = queue.pop()
+    while not fringe.isEmpty():
+        current_path = fringe.pop()
+        current_state = current_path[len(current_path) - 1]
 
-        for pos, dir, steps in problem.getSuccessors(node):
-            if not pos in visited:
-                visited.append(pos)
-                if problem.isGoalState(pos):
-                    return actions + [dir]
-                queue.push((pos, actions + [dir]))
+        if not current_state[0] in visited:
+            visited.append(current_state[0])
+
+            if problem.isGoalState(current_state[0]):
+                return map(lambda state: state[1], current_path[1:])
+
+            non_visited_states = filter(lambda next_successor: not next_successor[0] in visited,
+                                        problem.getSuccessors(current_state[0]))
+
+            for successor in non_visited_states:
+                next_item = list(current_path)
+                next_item.append(successor)
+                fringe.push(next_item)
 
 
 def uniformCostSearch(problem):
@@ -160,21 +182,41 @@ def uniformCostSearch(problem):
     "*** YOUR CODE HERE ***"
     # util.raiseNotDefined()
     #use PriorityQueue
-    pri_queue=util.PriorityQueue()
-    state=problem.getStartState()
-    #tumple for item,0 for Priority last,just to initialize
-    pri_queue.push((state,[]),0)
-    visited=[]
-    while not pri_queue.isEmpty():
-        current_state, actions = pri_queue.pop()
-        if problem.isGoalState(current_state):
-            return actions
-        visited.append(current_state)
+    # pri_queue=util.PriorityQueue()
+    # state=problem.getStartState()
+    # #tumple for item,0 for Priority last,just to initialize
+    # pri_queue.push((state,[]),0)
+    # visited=[]
+    # while not pri_queue.isEmpty():
+    #     current_state, actions = pri_queue.pop()
+    #     if problem.isGoalState(current_state):
+    #         return actions
+    #     visited.append(current_state)
+    #
+    #     for pos,dir,steps in problem.getSuccessors(current_state):
+    #         if pos not in visited:
+    #             next_actions=actions+[dir]
+    #             pri_queue.push((pos,next_actions),problem.getCostOfActions(next_actions))
+    visited = []
+    fringe = util.PriorityQueue()
+    start=([(problem.getStartState(), 'STOP', 0)],0)
+    fringe.push(start,0)
+    while not fringe.isEmpty():
+        current_path = fringe.pop()
+        current_state = current_path[0][len(current_path[0]) - 1]
+        if not current_state[0] in visited:
+            visited.append(current_state[0])
+            if problem.isGoalState(current_state[0]):
+                return map(lambda state: state[1], current_path[0][1:])
 
-        for pos,dir,steps in problem.getSuccessors(current_state):
-            if pos not in visited:
-                next_actions=actions+[dir]
-                pri_queue.push((pos,next_actions),problem.getCostOfActions(next_actions))
+            non_visited_states = filter(lambda next_successor: not next_successor[0] in visited,
+                                        problem.getSuccessors(current_state[0]))
+
+            for successor in non_visited_states:
+                cost=current_path[1]+successor[2]
+                next_item = (list(current_path[0]),cost)
+                next_item[0].append(successor)
+                fringe.push(next_item,cost)
 
 
 def nullHeuristic(state, problem=None):
@@ -188,8 +230,28 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     # util.raiseNotDefined()
+    visited = []
+    fringe = util.PriorityQueue()
+    start = ([(problem.getStartState(), 'STOP', 0)], 0)
+    fringe.push(start, 0)
+    while not fringe.isEmpty():
+        current_path = fringe.pop()
+        current_state = current_path[0][len(current_path[0]) - 1]
 
+        if not current_state[0] in visited:
+            visited.append(current_state[0])
 
+            if problem.isGoalState(current_state[0]):
+                return map(lambda state: state[1], current_path[0][1:])
+
+            non_visited_states = filter(lambda next_successor: not next_successor[0] in visited,
+                                        problem.getSuccessors(current_state[0]))
+
+            for successor in non_visited_states:
+                cost = current_path[1] + successor[2]
+                next_item = (list(current_path[0]), cost)
+                next_item[0].append(successor)
+                fringe.push(next_item, cost+heuristic(successor[0],problem))
 
 
 # Abbreviations
