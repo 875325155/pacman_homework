@@ -289,6 +289,7 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
 
+
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state

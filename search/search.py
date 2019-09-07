@@ -236,30 +236,7 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    # util.raiseNotDefined()
-    # visited = []
-    # fringe = util.PriorityQueue()
-    # start = ([(problem.getStartState(), 'STOP', 0)], 0)
-    # fringe.push(start, 0)
-    # while not fringe.isEmpty():
-    #     current_path = fringe.pop()
-    #     current_state = current_path[0][len(current_path[0]) - 1]
-    #
-    #     if not current_state[0] in visited:
-    #         visited.append(current_state[0])
-    #
-    #         if problem.isGoalState(current_state[0]):
-    #             return map(lambda state: state[1], current_path[0][1:])
-    #
-    #         non_visited_states = filter(lambda next_successor: not next_successor[0] in visited,
-    #                                     problem.getSuccessors(current_state[0]))
-    #
-    #         for successor in non_visited_states:
-    #             cost = current_path[1] + successor[2]
-    #             next_item = (list(current_path[0]), cost)
-    #             next_item[0].append(successor)
-    #             fringe.push(next_item, cost+heuristic(successor[0],problem))
-    #
+
     pri_queue = util.PriorityQueue()
     state = problem.getStartState()
     pri_queue.update((state, [], 0), 0)
@@ -275,8 +252,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             explored = problem.getSuccessors(current_state)
             visited.append(current_state)
             for pos, dir, step_cost in explored:
-                if (pos not in visited):
-                    pri_queue.update((pos, actions + [dir], fn + step_cost), fn + step_cost+nullHeuristic(pos,problem))
+                if pos not in visited:
+                    #the question is that nullHeuristic(pos,problem) is always 0,something strange
+                    pri_queue.update((pos, actions + [dir], fn + step_cost), fn + step_cost+heuristic(pos,problem))
+
 
 
 # Abbreviations
