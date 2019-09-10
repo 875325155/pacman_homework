@@ -221,6 +221,7 @@ def uniformCostSearch(problem):
             return actions
         if current_state not in visited:
             explored = problem.getSuccessors(current_state)
+            # print explored
             visited.append(current_state)
             for pos, dir, step_cost in explored:
                 if (pos not in visited):

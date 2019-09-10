@@ -362,7 +362,7 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
-
+import math
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -383,11 +383,98 @@ def cornersHeuristic(state, problem):
     #use manhaton distance
     # print corners
     # return 0 # Default to trivial solution
-    list_dis=[]
-    for i in range(4):
-        dis=abs(corners[i][0]-state[0][0])+abs(corners[i][1]-state[0][1])
-        list_dis.append(dis)
-    return min(list_dis)
+    #something wrong  node->2007
+    # list_dis=[]
+    # for i in range(4):
+    #     dis=abs(corners[i][0]-state[0][0])+abs(corners[i][1]-state[0][1])
+    #     list_dis.append(dis)
+    # return min(list_dis)
+
+    #node 1745 get 1/3
+    # list_dis=[]
+    # ans=[]
+    # for i in range(4):
+    #     if(corners[i] not in state[1]):
+    #         list_dis.append(corners[i])
+    # try:
+    #     for i in range(len(list_dis)):
+    #         # print list_dis
+    #         dis=abs(list_dis[i][0]-state[0][0])+abs(list_dis[i][1]-state[0][1])
+    #         ans.append(dis)
+    #     return min(ans)
+    # except:
+    #     return  0
+
+    # node 1833 get 1/3
+    # list_dis=[i for i in corners if i not in state[1]]
+    # ans=[]
+    # # print list_dis
+    # try:
+    #     for i in range(len(list_dis)):
+    #         # print list_dis
+    #         # dis=abs(list_dis[i][0]-state[0][0])+abs(list_dis[i][1]-state[0][1])+(math.sqrt((list_dis[i][0]-state[0][0])**2+(list_dis[i][1]-state[0][1])**2))
+    #         dis=(math.sqrt((list_dis[i][0]-state[0][0])**2+(list_dis[i][1]-state[0][1])**2))
+    #         ans.append(dis)
+    #     return min(ans)
+    # except:
+    #     return  0
+
+    #try to think the wall,to get greater score
+    '''
+     so to check if there is a wall at (x,y), just call
+        walls = state.getWalls()
+        if walls[x][y] == True: ...
+    '''
+
+    list_dis = [i for i in corners if i not in state[1]]
+    ans=[]
+    try:
+        for i in range(len(list_dis)):
+            # print list_dis
+            dis=abs(list_dis[i][0]-state[0][0])+abs(list_dis[i][1]-state[0][1])
+            dis_wall=dis_from_wall(walls,list_dis[i],state[0],list_dis)
+            dis+=dis_wall
+            ans.append(dis)
+        return min(ans)
+    except:
+        return  0
+
+def dis_from_wall(walls,corner,point,remaining):
+    weight=len(remaining)
+    wall_height, wall_width = 0, 0
+
+    min_x, max_x = min(point[0], corner[0]), max(point[0], corner[0])
+    min_y, max_y = min(point[1], corner[1]), max(point[1], corner[1])
+
+    for i in range(min_x, max_x + 1):
+        if walls[i][max_y]:
+            wall_height += 1
+        if walls[i][min_y]:
+            wall_width += 1;
+
+    for j in range(min_y, max_y):
+        if walls[max_x][j]:
+            #height
+            wall_height += 1
+        if walls[min_x][j]:
+            #width
+            wall_width += 1
+    #if this 1/3  node 1614
+    # s=min(wall_height, wall_width)
+    # return 2*s
+    #this return 2/3  node 1483
+    # return weight*min(wall_height, wall_width)
+    # this return 2/3  node 1360
+    return weight * min(wall_height, wall_width)*2
+    #if weight*2++ this will fail
+    # return weight * min(wall_height, wall_width) * 2
+
+
+
+
+
+
+
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
     def __init__(self):
@@ -479,8 +566,19 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    # print position,foodGrid
     "*** YOUR CODE HERE ***"
-    return 0
+    food_coordinates = foodGrid.asList()
+    # print food_coordinates
+    if not food_coordinates:
+        return 0
+    res = -1
+    for food in food_coordinates:
+        dist = mazeDistance(food, position, problem.startingGameState)
+        res = max(res, dist)
+    return res
+
+    # return 0
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
