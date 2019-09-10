@@ -608,8 +608,9 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.ucs(problem)
+        # "*** YOUR CODE HERE ***"
+        # util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -630,6 +631,17 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         "Stores information from the gameState.  You don't need to change this."
         # Store the food for later reference
         self.food = gameState.getFood()
+        '''
+        
+        Returns a Grid of boolean food indicator variables.
+
+        Grids can be accessed via list notation, so to check
+        if there is food at (x,y), just call
+
+        currentFood = state.getFood()
+        if currentFood[x][y] == True: ...
+        
+        '''
 
         # Store info for the PositionSearchProblem (no need to change this)
         self.walls = gameState.getWalls()
@@ -644,8 +656,12 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         """
         x,y = state
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # # print position,foodGrid
+        # # "*** YOUR CODE HERE ***"
+        # food_coordinates = self.food
+        # return state==food_coordinates
+        # # return state == list(self.food)
+        return state in self.food.asList()
 
 def mazeDistance(point1, point2, gameState):
     """
